@@ -1,20 +1,41 @@
 import os
-import requests
+import sys
+import traceback
 from django.conf import settings
+
+# Prevent TensorFlow from searching for CUDA / GPU and reduce memory consumption
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 MODEL_PATH = settings.AI_MODEL_PATH
 GDRIVE_FILE_ID = '1wFGyiCBS2JilypI3QvX0uYcWf4TxC2uf'
 
+# Check possible locations for the model file
+def resolve_model_path():
+    candidate_paths = [
+        MODEL_PATH,
+        os.path.join(str(settings.BASE_DIR), 'ml_model', 'wastewise_model.keras'),
+        os.path.join(os.path.dirname(str(settings.BASE_DIR)), 'ml_model', 'wastewise_model.keras'),
+        os.path.join(os.path.dirname(str(settings.BASE_DIR)), 'backend', 'ml_model', 'wastewise_model.keras'),
+    ]
+    for path in candidate_paths:
+        if os.path.exists(path) and os.path.getsize(path) > 1000:
+            return path
+    return MODEL_PATH
 
-def download_model():
-    print('Downloading model from Google Drive...')
-    os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
+
+def download_model(target_path):
+    print(f'Downloading model from Google Drive to {target_path}...', flush=True)
+    os.makedirs(os.path.dirname(target_path), exist_ok=True)
     try:
         import gdown
-        gdown.download(id=GDRIVE_FILE_ID, output=MODEL_PATH, quiet=False, fuzzy=True)
-        print(f'Model downloaded to {MODEL_PATH}')
+        gdown.download(id=GDRIVE_FILE_ID, output=target_path, quiet=False, fuzzy=True)
+        print(f'Model downloaded successfully to {target_path}', flush=True)
     except Exception as e:
-        raise RuntimeError(f'Failed to download model: {e}')
+        print(f'Failed to download model: {e}', flush=True)
+        traceback.print_exc()
+        raise RuntimeError(f'Failed to download model from Google Drive: {e}')
 
 
 model = None
@@ -23,14 +44,16 @@ model = None
 def get_model():
     global model
     if model is None:
-        # Lazy import TensorFlow — only loaded when first scan is requested,
-        # not at Django startup. This prevents OOM on Render free tier.
         import tensorflow as tf
-        if not os.path.exists(MODEL_PATH):
-            download_model()
-        print(f'Loading model from {MODEL_PATH}')
-        model = tf.keras.models.load_model(MODEL_PATH)
-        print('Model loaded!')
+        
+        target_path = resolve_model_path()
+        if not os.path.exists(target_path) or os.path.getsize(target_path) < 1000:
+            download_model(target_path)
+            
+        print(f'Loading model from {target_path}...', flush=True)
+        # compile=False avoids loading training optimizers/loss, saving RAM and CPU time
+        model = tf.keras.models.load_model(target_path, compile=False)
+        print('Model loaded successfully!', flush=True)
     return model
 
 
@@ -45,6 +68,10 @@ def preprocess_image(image_file):
     import numpy as np
     from PIL import Image
     import tensorflow as tf
+    
+    if hasattr(image_file, 'seek'):
+        image_file.seek(0)
+        
     img = Image.open(image_file).convert('RGB')
     img = img.resize((224, 224))
     img_array = np.array(img).astype('float32')
@@ -75,4 +102,6 @@ def classify_waste(image_file):
             'all_scores': all_scores,
         }
     except Exception as e:
+        print(f'Error in classify_waste: {e}', flush=True)
+        traceback.print_exc()
         return {'success': False, 'error': str(e)}

@@ -304,18 +304,25 @@ def admin_dashboard_view(request):
 
 def classify_image(request):
     """Classify an uploaded waste image and return JSON."""
-    if request.method != 'POST':
-        return JsonResponse({'success': False, 'error': 'POST required'}, status=405)
-    if not request.user.is_authenticated:
-        return JsonResponse({'success': False, 'error': 'Authentication required. Please log in.'}, status=401)
-    if 'image' not in request.FILES:
-        return JsonResponse({'success': False, 'error': 'No image provided'}, status=400)
-    image_file = request.FILES['image']
-    allowed_types = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp']
-    if image_file.content_type not in allowed_types:
-        return JsonResponse({'success': False, 'error': 'Invalid file type. JPG, PNG and WebP supported.'}, status=400)
-    
-    result = classify_waste(image_file)
-    if not result.get('success'):
-        return JsonResponse(result, status=500)
-    return JsonResponse(result)
+    try:
+        if request.method != 'POST':
+            return JsonResponse({'success': False, 'error': 'POST method required.'}, status=405)
+        if not request.user.is_authenticated:
+            return JsonResponse({'success': False, 'error': 'Authentication required. Please log in.'}, status=401)
+        if 'image' not in request.FILES:
+            return JsonResponse({'success': False, 'error': 'No image provided.'}, status=400)
+        
+        image_file = request.FILES['image']
+        allowed_types = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp']
+        if image_file.content_type not in allowed_types:
+            return JsonResponse({'success': False, 'error': 'Invalid file type. JPG, PNG and WebP supported.'}, status=400)
+        
+        result = classify_waste(image_file)
+        if not result.get('success'):
+            return JsonResponse({'success': False, 'error': result.get('error', 'Classification failed.')}, status=200)
+        return JsonResponse(result)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({'success': False, 'error': f'Server error during classification: {str(e)}'}, status=200)
+
