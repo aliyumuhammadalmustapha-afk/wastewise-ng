@@ -40,7 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Helper: Get CSRF token
     function getCsrfToken() {
         const input = document.querySelector('input[name="csrfmiddlewaretoken"]');
-        return input ? input.value : '';
+        if (input && input.value) return input.value;
+        const match = document.cookie.match(/(^|;)\s*csrftoken=([^;]+)/);
+        return match ? decodeURIComponent(match[2]) : '';
     }
 
     // Helper: Show status message
@@ -239,7 +241,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: formData
             });
 
-            const data = await response.json();
+            const contentType = response.headers.get('content-type') || '';
+            let data;
+            if (contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                const text = await response.text();
+                if (response.status === 403) {
+                    throw new Error('CSRF or permission verification failed. Please refresh the page.');
+                } else if (response.status === 401) {
+                    throw new Error('You must be logged in to classify images.');
+                } else {
+                    throw new Error(`Server returned status ${response.status}. Please check server logs.`);
+                }
+            }
+
             if (!response.ok || !data.success) {
                 throw new Error(data.error || 'Failed to classify the image.');
             }

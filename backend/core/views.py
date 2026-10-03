@@ -104,9 +104,11 @@ def scan_view(request):
 
     return render(request, 'scan.html', {'waste_info': WASTE_INFO})
 
-@login_required
 @require_POST
 def api_save_scan(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required. Please log in.'}, status=401)
+
     try:
         data = json.loads(request.body)
     except (json.JSONDecodeError, UnicodeDecodeError, TypeError):
@@ -300,11 +302,12 @@ def admin_dashboard_view(request):
     }
     return render(request, 'admin_dashboard.html', context)
 
-@login_required
 def classify_image(request):
     """Classify an uploaded waste image and return JSON."""
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'POST required'}, status=405)
+    if not request.user.is_authenticated:
+        return JsonResponse({'success': False, 'error': 'Authentication required. Please log in.'}, status=401)
     if 'image' not in request.FILES:
         return JsonResponse({'success': False, 'error': 'No image provided'}, status=400)
     image_file = request.FILES['image']
