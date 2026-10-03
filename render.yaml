@@ -2,12 +2,15 @@ services:
   - type: web
     name: wastewise-ng
     env: python
+    region: oregon
+    plan: free
+    pythonVersion: "3.12.7"
     buildCommand: "./build.sh"
     startCommand: "cd backend && gunicorn backend.wsgi:application"
     envVars:
       - key: DEBUG
-        value: False
+        value: false
       - key: SECRET_KEY
         generateValue: true
       - key: PYTHON_VERSION
-        value: 3.12.0
+        value: "3.12.7"
