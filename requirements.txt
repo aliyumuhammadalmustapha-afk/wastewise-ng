@@ -21,6 +21,7 @@ tensorflow==2.18.0
 numpy==1.26.4
 pillow==11.0.0
 h5py==3.12.1
+gdown==5.2.0
 
 # HTTP
 requests==2.32.3

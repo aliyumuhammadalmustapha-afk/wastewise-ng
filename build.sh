@@ -3,8 +3,25 @@ set -o errexit
 
 pip install -r requirements.txt
 cd backend
+
 python manage.py collectstatic --no-input
 python manage.py migrate
+
+# Download ML model from Google Drive if not already present
+MODEL_PATH="ml_model/wastewise_model.keras"
+GDRIVE_FILE_ID="1wFGyiCBS2JilypI3QvX0uYcWf4TxC2uf"
+
+if [ ! -f "$MODEL_PATH" ]; then
+    echo "==> Downloading ML model from Google Drive..."
+    mkdir -p ml_model
+    python -c "
+import gdown
+gdown.download(id='$GDRIVE_FILE_ID', output='$MODEL_PATH', quiet=False, fuzzy=True)
+print('Model downloaded successfully.')
+"
+else
+    echo "==> ML model already exists, skipping download."
+fi
 
 # Auto-create superuser from environment variables (only if DJANGO_SUPERUSER_USERNAME is set)
 if [ -n "$DJANGO_SUPERUSER_USERNAME" ]; then

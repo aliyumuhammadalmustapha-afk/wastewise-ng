@@ -12,24 +12,12 @@ GDRIVE_FILE_ID = '1wFGyiCBS2JilypI3QvX0uYcWf4TxC2uf'
 def download_model():
     print('Downloading model from Google Drive...')
     os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
-    
-    url = f'https://drive.google.com/uc?export=download&id={GDRIVE_FILE_ID}'
-    session = requests.Session()
-    response = session.get(url, stream=True)
-    
-    # Handle Google Drive large file warning
-    for key, value in response.cookies.items():
-        if key.startswith('download_warning'):
-            url = url + '&confirm=' + value
-            response = session.get(url, stream=True)
-            break
-    
-    with open(MODEL_PATH, 'wb') as f:
-        for chunk in response.iter_content(32768):
-            if chunk:
-                f.write(chunk)
-    
-    print(f'Model downloaded to {MODEL_PATH}')
+    try:
+        import gdown
+        gdown.download(id=GDRIVE_FILE_ID, output=MODEL_PATH, quiet=False, fuzzy=True)
+        print(f'Model downloaded to {MODEL_PATH}')
+    except Exception as e:
+        raise RuntimeError(f'Failed to download model: {e}')
 
 model = None
 
