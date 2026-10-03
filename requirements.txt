@@ -1,6 +1,6 @@
 # Core Django
 Django==6.1
-asgiref==3.8.1
+asgiref==3.9.1
 sqlparse==0.5.3
 
 # REST API
