@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Waste Scanner | WasteWise NG{% endblock %}
+
+{% block content %}
+<main class="page-content section-sm">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr;gap:32px;" class="scanner-layout">
+      <style>
+        @media (min-width: 1024px) {
+          .scanner-layout {
+            grid-template-columns: 1.15fr 0.85fr !important;
+            align-items: start;
+          }
+        }
+      </style>
+
+      <!-- Left Column: Scanner Interface -->
+      <div>
+        <div style="margin-bottom:28px;">
+          <h2 style="font-size:36px;font-weight:700;color:#111827;letter-spacing:-0.02em;">Waste Scanner</h2>
+          <p style="font-size:16px;color:#4A5E4E;margin-top:6px;">Upload a photo or use your camera to identify waste</p>
+        </div>
+
+        <!-- Tab Buttons -->
+        <div style="display:flex;gap:12px;margin-bottom:24px;">
+          <button type="button" id="tab-upload-btn" class="btn-primary" style="flex:1;justify-content:center;">
+            <i data-lucide="upload" style="width:16px;height:16px;"></i>
+            Upload Image
+          </button>
+          <button type="button" id="tab-camera-btn" class="btn-secondary" style="flex:1;justify-content:center;">
+            <i data-lucide="camera" style="width:16px;height:16px;"></i>
+            Camera Scan
+          </button>
+        </div>
+
+        <!-- Upload Panel -->
+        <div id="upload-panel">
+          <div class="upload-zone" id="upload-dropzone">
+            <div class="category-icon" style="margin:0 auto 16px;">
+              <i data-lucide="upload" style="width:22px;height:22px;"></i>
+            </div>
+            <p style="font-weight:600;color:#1B3A2D;margin-bottom:4px;">
+              Drop your image here
+            </p>
+            <p style="font-size:14px;color:#6B7280;">
+              or click to browse · JPG, PNG, WebP
+            </p>
+            <input type="file" id="dropzone-file" name="waste_image" class="sr-only" accept="image/png,image/jpeg,image/webp,image/jpg">
+          </div>
+
+          <!-- Image Preview Card (hidden until selected) -->
+          <div id="preview-card" class="ww-card" style="display:none;margin-top:20px;padding:24px;">
+            <div style="display:flex;gap:20px;align-items:center;">
+              <img id="preview-image" src="" alt="Waste Preview" style="width:100px;height:100px;object-fit:cover;border-radius:12px;border:1px solid #E8E4DD;">
+              <div style="flex:1;min-width:0;">
+                <p id="preview-filename" style="font-weight:600;color:#111827;font-size:15px;word-break:break-all;"></p>
+                <p style="font-size:13px;color:#6B7280;margin-top:4px;">Ready to classify</p>
+                <button type="button" id="remove-preview-btn" style="background:none;border:none;color:#991B1B;font-size:13px;font-weight:600;cursor:pointer;padding:0;margin-top:8px;">
+                  Remove photo
+                </button>
+              </div>
+            </div>
+            <div style="margin-top:20px;">
+              <button type="button" id="classify-btn" class="btn-primary" style="width:100%;justify-content:center;">
+                <i data-lucide="scan" style="width:16px;height:16px;"></i>
+                Classify this image
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Camera Panel (hidden by default) -->
+        <div id="camera-panel" style="display:none;">
+          <div class="camera-frame" style="position:relative;display:flex;align-items:center;justify-content:center;">
+            <video id="camera-video" autoplay playsinline style="width:100%;height:100%;object-fit:cover;display:none;"></video>
+            <div id="camera-placeholder" style="text-align:center;padding:32px;color:rgba(255,255,255,0.7);">
+              <div class="category-icon" style="margin:0 auto 16px;background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);color:#FFFFFF;">
+                <i data-lucide="camera" style="width:24px;height:24px;"></i>
+              </div>
+              <p style="font-weight:600;color:#FFFFFF;margin-bottom:4px;">Camera is not started</p>
+              <p style="font-size:13px;">Click the button below to enable camera</p>
+            </div>
+          </div>
+          <canvas id="camera-canvas" style="display:none;"></canvas>
+
+          <div style="display:flex;justify-content:center;gap:16px;margin-top:20px;">
+            <button type="button" id="start-camera-btn" class="btn-secondary">
+              <i data-lucide="video" style="width:16px;height:16px;"></i>
+              Start Camera
+            </button>
+            <button type="button" id="capture-camera-btn" class="btn-primary" style="display:none;border-radius:50%;width:56px;height:56px;padding:0;justify-content:center;" title="Capture photo">
+              <i data-lucide="camera" style="width:24px;height:24px;"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-state" style="display:none;margin-top:24px;">
+          <div class="ww-card" style="text-align:center;padding:48px;">
+            <div class="ww-spinner" style="margin:0 auto 16px;"></div>
+            <p style="font-weight:600;color:#1B3A2D;font-size:16px;">Analysing waste...</p>
+            <p style="font-size:14px;color:#6B7280;margin-top:4px;">
+              This takes just a moment
+            </p>
+          </div>
+        </div>
+
+        <!-- Status Message Box -->
+        <div id="scan-status-message" style="display:none;margin-top:16px;"></div>
+
+        <!-- Category Result + Item Selection -->
+        <div id="category-result" style="display:none;margin-top:24px;">
+          <div class="ww-card" style="margin-bottom:16px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+              <div>
+                <p class="result-section-label">Detected category</p>
+                <h3 id="detected-category" style="font-size:28px;margin-top:4px;color:#111827;"></h3>
+              </div>
+              <span id="confidence-badge" class="badge badge-safe"></span>
+            </div>
+            <p style="font-size:14px;color:#4A5E4E;margin-bottom:16px;">
+              Help us be more specific – what type is this item?
+            </p>
+            <div id="item-selection-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Result Card -->
+      <div>
+        <div class="ww-card result-reveal" id="result-card" style="display:none;">
+          <!-- Header -->
+          <div style="margin-bottom:8px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+              <span id="result-category-badge" class="badge badge-category"></span>
+              <span id="result-danger-badge" class="badge"></span>
+              <span style="font-size:13px;color:#6B7280;margin-left:auto;">
+                <span id="result-confidence"></span>% confident
+              </span>
+            </div>
+            <h2 id="result-name" style="font-size:32px;letter-spacing:-0.01em;"></h2>
+            <p id="result-material" style="font-size:14px;color:#6B7280;margin-top:6px;"></p>
+          </div>
+          
+          <hr class="ww-divider" style="margin:20px 0;">
+          
+          <!-- Danger level -->
+          <div id="result-danger-card" class="danger-card" style="margin-bottom:20px;">
+            <p class="result-section-label">Danger level</p>
+            <p id="result-danger-text" class="result-section-value" style="font-weight:600;font-size:18px;margin-top:4px;"></p>
+          </div>
+          
+          <!-- Info grid -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#E8E4DD;border-radius:12px;overflow:hidden;margin-bottom:20px;">
+            <div style="background:#FFFFFF;padding:20px;">
+              <p class="result-section-label">Decomposes in</p>
+              <p id="result-decomp" class="result-section-value" style="font-weight:600;margin-top:4px;font-size:14px;"></p>
+            </div>
+            <div style="background:#FFFFFF;padding:20px;">
+              <p class="result-section-label">Made of</p>
+              <p id="result-material-grid" class="result-section-value" style="font-weight:600;margin-top:4px;font-size:14px;"></p>
+            </div>
+          </div>
+          
+          <!-- Environmental impact -->
+          <div class="result-section">
+            <p class="result-section-label">
+              <i data-lucide="globe" style="width:12px;height:12px;display:inline;margin-right:4px;"></i>
+              Environmental impact
+            </p>
+            <p id="result-impact" class="result-section-value" style="margin-top:8px;"></p>
+          </div>
+          
+          <!-- Disposal steps -->
+          <div class="result-section">
+            <p class="result-section-label">
+              <i data-lucide="list-ordered" style="width:12px;height:12px;display:inline;margin-right:4px;"></i>
+              How to dispose
+            </p>
+            <ol id="result-disposal" style="margin-top:12px;padding-left:20px;display:flex;flex-direction:column;gap:8px;"></ol>
+          </div>
+          
+          <!-- Recycling tips -->
+          <div class="result-section">
+            <p class="result-section-label">
+              <i data-lucide="recycle" style="width:12px;height:12px;display:inline;margin-right:4px;"></i>
+              Recycling tips
+            </p>
+            <p id="result-recycling" class="result-section-value" style="margin-top:8px;"></p>
+          </div>
+          
+          <!-- Reuse ideas -->
+          <div class="result-section">
+            <p class="result-section-label">
+              <i data-lucide="refresh-cw" style="width:12px;height:12px;display:inline;margin-right:4px;"></i>
+              Reuse ideas
+            </p>
+            <p id="result-reuse" class="result-section-value" style="margin-top:8px;"></p>
+          </div>
+          
+          <!-- Fertilizer use — only show if not null -->
+          <div class="result-section" id="result-fertilizer-section" style="display:none;">
+            <p class="result-section-label">
+              <i data-lucide="sprout" style="width:12px;height:12px;display:inline;margin-right:4px;"></i>
+              Agricultural use
+            </p>
+            <p id="result-fertilizer" class="result-section-value" style="margin-top:8px;"></p>
+          </div>
+          
+          <!-- Fun fact -->
+          <div class="fun-fact-strip" style="margin-top:20px;">
+            <p class="fun-fact-label">
+              <i data-lucide="lightbulb" style="width:12px;height:12px;display:inline;margin-right:4px;color:#8A9A5B;"></i>
+              Nigerian fact
+            </p>
+            <p id="result-funfact"></p>
+          </div>
+          
+          <!-- Actions -->
+          <div style="display:flex;gap:12px;margin-top:24px;">
+            <button onclick="resetScanner()" class="btn-secondary" style="flex:1;justify-content:center;">
+              <i data-lucide="scan" style="width:16px;height:16px;"></i>
+              Scan another
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden CSRF token element for fetch calls -->
+  <form id="csrf-form" style="display:none;">{% csrf_token %}</form>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/knowledge_base.js' %}"></script>
+<script src="{% static 'js/category_items.js' %}"></script>
+<script src="{% static 'js/scanner.js' %}"></script>
+{% endblock %}

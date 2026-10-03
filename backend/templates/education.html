@@ -1,0 +1,546 @@
+{% extends 'base.html' %}
+{% block title %}Waste Education Hub | WasteWise NG{% endblock %}
+
+{% block content %}
+<main class="page-content section-sm">
+  <div class="container">
+    <!-- Page Header -->
+    <div style="max-width:720px;margin-bottom:48px;">
+      <span class="badge badge-category" style="margin-bottom:12px;">Environmental Knowledge</span>
+      <h2 style="font-size:48px;font-weight:700;color:#111827;letter-spacing:-0.02em;">Waste Education Hub</h2>
+      <p style="font-size:18px;color:#4A5E4E;margin-top:8px;">Everything you need to know about waste in Nigeria</p>
+    </div>
+
+    <!-- Nigerian Waste Spotlight strip -->
+    <div style="background:#1B3A2D;border-radius:16px;padding:40px;color:#FFFFFF;margin-bottom:56px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px;">
+      <div style="max-width:700px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <i data-lucide="lightbulb" style="width:18px;height:18px;color:#8A9A5B;"></i>
+          <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#8A9A5B;">Did you know?</span>
+        </div>
+        <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:26px;font-weight:700;line-height:1.4;color:#F2EFE9;margin-bottom:8px;letter-spacing:-0.02em;">
+          Nigeria generates 32 million tonnes of solid waste annually – less than 40% is properly managed.
+        </p>
+        <p style="font-size:13px;color:rgba(242,239,233,0.6);margin:0;">Source: World Bank Solid Waste Management Review</p>
+      </div>
+      <a href="{% url 'scan' %}" class="btn-primary" style="background:#8A9A5B;padding:12px 28px;">
+        <i data-lucide="scan" style="width:16px;height:16px;"></i>
+        Scan your waste
+      </a>
+    </div>
+
+    <!-- 9 Category Cards Grid -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(340px, 1fr));gap:24px;">
+      
+      <!-- Plastic -->
+      <div class="ww-card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div class="category-icon">
+              <i data-lucide="package" style="width:22px;height:22px;"></i>
+            </div>
+            <span class="badge badge-moderate">Moderate</span>
+          </div>
+          <h4 style="font-size:24px;font-weight:600;margin-bottom:10px;">Plastic</h4>
+          
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+            <span class="badge badge-category" style="font-size:11px;">Pure water sachet</span>
+            <span class="badge badge-category" style="font-size:11px;">PET bottles</span>
+            <span class="badge badge-category" style="font-size:11px;">Nylon bags</span>
+            <span class="badge badge-category" style="font-size:11px;">Ghana-must-go</span>
+          </div>
+          <p style="font-size:14px;color:#4A5E4E;line-height:1.5;margin-bottom:16px;">
+            Takes 450+ years to break down and fragments into microplastics.
+          </p>
+
+          <hr class="ww-divider" style="margin-bottom:16px;">
+
+          <div style="margin-bottom:12px;">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#8A9A5B;margin-bottom:6px;">Do's</p>
+            <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px;">
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="check" style="width:14px;height:14px;color:#8A9A5B;flex-shrink:0;margin-top:3px;"></i>
+                Rinse and compress clean bottles
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="check" style="width:14px;height:14px;color:#8A9A5B;flex-shrink:0;margin-top:3px;"></i>
+                Bag dry sachets for local plastic aggregators
+              </li>
+            </ul>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#991B1B;margin-bottom:6px;">Don'ts</p>
+            <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px;">
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="x" style="width:14px;height:14px;color:#991B1B;flex-shrink:0;margin-top:3px;"></i>
+                Never burn plastics (releases toxic dioxins)
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="x" style="width:14px;height:14px;color:#991B1B;flex-shrink:0;margin-top:3px;"></i>
+                Do not drop nylon in street gutters
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="background:#1B3A2D;border-radius:8px;padding:12px 16px;color:#D1FAE5;font-size:12px;line-height:1.4;">
+          60M sachets used daily in Nigeria; causes severe urban drainage blockages.
+        </div>
+      </div>
+
+      <!-- Metal -->
+      <div class="ww-card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div class="category-icon">
+              <i data-lucide="cylinder" style="width:22px;height:22px;"></i>
+            </div>
+            <span class="badge badge-moderate">Moderate</span>
+          </div>
+          <h4 style="font-size:24px;font-weight:600;margin-bottom:10px;">Metal</h4>
+          
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+            <span class="badge badge-category" style="font-size:11px;">Tomato tins</span>
+            <span class="badge badge-category" style="font-size:11px;">Peak milk cans</span>
+            <span class="badge badge-category" style="font-size:11px;">Milo tins</span>
+            <span class="badge badge-category" style="font-size:11px;">Drink cans</span>
+          </div>
+          <p style="font-size:14px;color:#4A5E4E;line-height:1.5;margin-bottom:16px;">
+            Infinitely recyclable. Highly sought after by local scrap dealers.
+          </p>
+
+          <hr class="ww-divider" style="margin-bottom:16px;">
+
+          <div style="margin-bottom:12px;">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#8A9A5B;margin-bottom:6px;">Do's</p>
+            <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px;">
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="check" style="width:14px;height:14px;color:#8A9A5B;flex-shrink:0;margin-top:3px;"></i>
+                Rinse out food paste residue completely
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="check" style="width:14px;height:14px;color:#8A9A5B;flex-shrink:0;margin-top:3px;"></i>
+                Flatten cans to reduce space and sell to scrap buyers
+              </li>
+            </ul>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#991B1B;margin-bottom:6px;">Don'ts</p>
+            <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px;">
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="x" style="width:14px;height:14px;color:#991B1B;flex-shrink:0;margin-top:3px;"></i>
+                Do not leave open tins standing outdoors (mosquito risk)
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="x" style="width:14px;height:14px;color:#991B1B;flex-shrink:0;margin-top:3px;"></i>
+                Avoid handling sharp jagged metal edges unshielded
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="background:#1B3A2D;border-radius:8px;padding:12px 16px;color:#D1FAE5;font-size:12px;line-height:1.4;">
+          Recycling aluminium cans saves 95% of energy needed for virgin smelting.
+        </div>
+      </div>
+
+      <!-- Glass -->
+      <div class="ww-card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div class="category-icon">
+              <i data-lucide="wine" style="width:22px;height:22px;"></i>
+            </div>
+            <span class="badge badge-moderate">Moderate</span>
+          </div>
+          <h4 style="font-size:24px;font-weight:600;margin-bottom:10px;">Glass</h4>
+          
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+            <span class="badge badge-category" style="font-size:11px;">Star/Guinness bottles</span>
+            <span class="badge badge-category" style="font-size:11px;">Soft drink bottles</span>
+            <span class="badge badge-category" style="font-size:11px;">Ogogoro bottles</span>
+          </div>
+          <p style="font-size:14px;color:#4A5E4E;line-height:1.5;margin-bottom:16px;">
+            Non-porous and durable. Circulates through deposit refund schemes.
+          </p>
+
+          <hr class="ww-divider" style="margin-bottom:16px;">
+
+          <div style="margin-bottom:12px;">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#8A9A5B;margin-bottom:6px;">Do's</p>
+            <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px;">
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="check" style="width:14px;height:14px;color:#8A9A5B;flex-shrink:0;margin-top:3px;"></i>
+                Return intact bottles to retailers for deposit refund
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="check" style="width:14px;height:14px;color:#8A9A5B;flex-shrink:0;margin-top:3px;"></i>
+                Wrap broken glass in sturdy paper and label clearly
+              </li>
+            </ul>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#991B1B;margin-bottom:6px;">Don'ts</p>
+            <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px;">
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="x" style="width:14px;height:14px;color:#991B1B;flex-shrink:0;margin-top:3px;"></i>
+                Do not mix broken window glass with container glass
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="x" style="width:14px;height:14px;color:#991B1B;flex-shrink:0;margin-top:3px;"></i>
+                Never throw bare loose broken glass into bags
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="background:#1B3A2D;border-radius:8px;padding:12px 16px;color:#D1FAE5;font-size:12px;line-height:1.4;">
+          Star and Guinness bottles are refilled an average of 25–30 times before cullet recycling.
+        </div>
+      </div>
+
+      <!-- Paper -->
+      <div class="ww-card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div class="category-icon">
+              <i data-lucide="file-text" style="width:22px;height:22px;"></i>
+            </div>
+            <span class="badge badge-safe">Safe</span>
+          </div>
+          <h4 style="font-size:24px;font-weight:600;margin-bottom:10px;">Paper & Cardboard</h4>
+          
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+            <span class="badge badge-category" style="font-size:11px;">Delivery cartons</span>
+            <span class="badge badge-category" style="font-size:11px;">Newspapers</span>
+            <span class="badge badge-category" style="font-size:11px;">Office A4</span>
+          </div>
+          <p style="font-size:14px;color:#4A5E4E;line-height:1.5;margin-bottom:16px;">
+            Easily pulped and remanufactured if kept clean and dry.
+          </p>
+
+          <hr class="ww-divider" style="margin-bottom:16px;">
+
+          <div style="margin-bottom:12px;">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#8A9A5B;margin-bottom:6px;">Do's</p>
+            <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px;">
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="check" style="width:14px;height:14px;color:#8A9A5B;flex-shrink:0;margin-top:3px;"></i>
+                Flatten and bundle cardboard cartons flat
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="check" style="width:14px;height:14px;color:#8A9A5B;flex-shrink:0;margin-top:3px;"></i>
+                Shred clean newsprint for organic composting brown material
+              </li>
+            </ul>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#991B1B;margin-bottom:6px;">Don'ts</p>
+            <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px;">
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="x" style="width:14px;height:14px;color:#991B1B;flex-shrink:0;margin-top:3px;"></i>
+                Do not mix grease-soaked suya wrapping paper in dry recycling
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="x" style="width:14px;height:14px;color:#991B1B;flex-shrink:0;margin-top:3px;"></i>
+                Never burn piles of office documents outdoors
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="background:#1B3A2D;border-radius:8px;padding:12px 16px;color:#D1FAE5;font-size:12px;line-height:1.4;">
+          1 tonne of recycled cardboard saves 17 trees and 26,000 litres of water.
+        </div>
+      </div>
+
+      <!-- Organic -->
+      <div class="ww-card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div class="category-icon">
+              <i data-lucide="leaf" style="width:22px;height:22px;"></i>
+            </div>
+            <span class="badge badge-safe">Safe</span>
+          </div>
+          <h4 style="font-size:24px;font-weight:600;margin-bottom:10px;">Organic</h4>
+          
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+            <span class="badge badge-category" style="font-size:11px;">Cassava peels</span>
+            <span class="badge badge-category" style="font-size:11px;">Yam peels</span>
+            <span class="badge badge-category" style="font-size:11px;">Palm kernel</span>
+            <span class="badge badge-category" style="font-size:11px;">Food scraps</span>
+          </div>
+          <p style="font-size:14px;color:#4A5E4E;line-height:1.5;margin-bottom:16px;">
+            Nutrient-rich biomass suitable for composting, animal feed, or biogas.
+          </p>
+
+          <hr class="ww-divider" style="margin-bottom:16px;">
+
+          <div style="margin-bottom:12px;">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#8A9A5B;margin-bottom:6px;">Do's</p>
+            <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px;">
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="check" style="width:14px;height:14px;color:#8A9A5B;flex-shrink:0;margin-top:3px;"></i>
+                Separate vegetable peels for garden compost piles
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="check" style="width:14px;height:14px;color:#8A9A5B;flex-shrink:0;margin-top:3px;"></i>
+                Dry cassava/yam peels for clean livestock feed supplementation
+              </li>
+            </ul>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#991B1B;margin-bottom:6px;">Don'ts</p>
+            <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px;">
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="x" style="width:14px;height:14px;color:#991B1B;flex-shrink:0;margin-top:3px;"></i>
+                Do not mix plastics, batteries, or foil into compost heaps
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="x" style="width:14px;height:14px;color:#991B1B;flex-shrink:0;margin-top:3px;"></i>
+                Do not leave open rotting food unshielded from pests
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="background:#1B3A2D;border-radius:8px;padding:12px 16px;color:#D1FAE5;font-size:12px;line-height:1.4;">
+          Over 50% of Nigerian domestic waste is organic and can directly enrich agricultural soil.
+        </div>
+      </div>
+
+      <!-- E-Waste -->
+      <div class="ww-card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div class="category-icon">
+              <i data-lucide="cpu" style="width:22px;height:22px;"></i>
+            </div>
+            <span class="badge badge-hazardous">Hazardous</span>
+          </div>
+          <h4 style="font-size:24px;font-weight:600;margin-bottom:10px;">E-Waste</h4>
+          
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+            <span class="badge badge-category" style="font-size:11px;">Mobile phones</span>
+            <span class="badge badge-category" style="font-size:11px;">Chargers</span>
+            <span class="badge badge-category" style="font-size:11px;">Lanterns</span>
+            <span class="badge badge-category" style="font-size:11px;">Inverter batteries</span>
+          </div>
+          <p style="font-size:14px;color:#4A5E4E;line-height:1.5;margin-bottom:16px;">
+            Contains recoverable precious metals alongside toxic heavy metals.
+          </p>
+
+          <hr class="ww-divider" style="margin-bottom:16px;">
+
+          <div style="margin-bottom:12px;">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#8A9A5B;margin-bottom:6px;">Do's</p>
+            <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px;">
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="check" style="width:14px;height:14px;color:#8A9A5B;flex-shrink:0;margin-top:3px;"></i>
+                Deliver old handsets to certified take-back recyclers
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="check" style="width:14px;height:14px;color:#8A9A5B;flex-shrink:0;margin-top:3px;"></i>
+                Keep damaged lithium and lead-acid batteries stored dry
+              </li>
+            </ul>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#991B1B;margin-bottom:6px;">Don'ts</p>
+            <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px;">
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="x" style="width:14px;height:14px;color:#991B1B;flex-shrink:0;margin-top:3px;"></i>
+                Never burn cables or circuit boards (releases lead/cadmium)
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="x" style="width:14px;height:14px;color:#991B1B;flex-shrink:0;margin-top:3px;"></i>
+                Never mix old batteries into general domestic rubbish
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="background:#1B3A2D;border-radius:8px;padding:12px 16px;color:#D1FAE5;font-size:12px;line-height:1.4;">
+          Nigeria imports and generates over 500,000 tonnes of electronics waste each year.
+        </div>
+      </div>
+
+      <!-- Textile -->
+      <div class="ww-card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div class="category-icon">
+              <i data-lucide="scissors" style="width:22px;height:22px;"></i>
+            </div>
+            <span class="badge badge-safe">Safe</span>
+          </div>
+          <h4 style="font-size:24px;font-weight:600;margin-bottom:10px;">Textile</h4>
+          
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+            <span class="badge badge-category" style="font-size:11px;">Ankara fabric</span>
+            <span class="badge badge-category" style="font-size:11px;">Okrika wear</span>
+            <span class="badge badge-category" style="font-size:11px;">Head-ties (Gele)</span>
+          </div>
+          <p style="font-size:14px;color:#4A5E4E;line-height:1.5;margin-bottom:16px;">
+            Natural and synthetic woven fibers suitable for mending, upcycling, or shredding.
+          </p>
+
+          <hr class="ww-divider" style="margin-bottom:16px;">
+
+          <div style="margin-bottom:12px;">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#8A9A5B;margin-bottom:6px;">Do's</p>
+            <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px;">
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="check" style="width:14px;height:14px;color:#8A9A5B;flex-shrink:0;margin-top:3px;"></i>
+                Donate clean wearable clothes to charity or community drives
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="check" style="width:14px;height:14px;color:#8A9A5B;flex-shrink:0;margin-top:3px;"></i>
+                Upcycle tailoring scraps into patchwork quilts and cleaning dusters
+              </li>
+            </ul>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#991B1B;margin-bottom:6px;">Don'ts</p>
+            <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px;">
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="x" style="width:14px;height:14px;color:#991B1B;flex-shrink:0;margin-top:3px;"></i>
+                Do not compost synthetic polyester or treated fabrics
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="x" style="width:14px;height:14px;color:#991B1B;flex-shrink:0;margin-top:3px;"></i>
+                Avoid discarding wearable clothes into dumpsite bins
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="background:#1B3A2D;border-radius:8px;padding:12px 16px;color:#D1FAE5;font-size:12px;line-height:1.4;">
+          Nigerian tailoring produces thousands of tonnes of colourful Ankara offcuts annually.
+        </div>
+      </div>
+
+      <!-- Hazardous -->
+      <div class="ww-card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div class="category-icon">
+              <i data-lucide="alert-triangle" style="width:22px;height:22px;"></i>
+            </div>
+            <span class="badge badge-hazardous">Hazardous</span>
+          </div>
+          <h4 style="font-size:24px;font-weight:600;margin-bottom:10px;">Hazardous</h4>
+          
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+            <span class="badge badge-category" style="font-size:11px;">Pesticide cans</span>
+            <span class="badge badge-category" style="font-size:11px;">Engine oil cans</span>
+            <span class="badge badge-category" style="font-size:11px;">Paint drums</span>
+          </div>
+          <p style="font-size:14px;color:#4A5E4E;line-height:1.5;margin-bottom:16px;">
+            Toxic, flammable, and corrosive materials requiring professional disposal routes.
+          </p>
+
+          <hr class="ww-divider" style="margin-bottom:16px;">
+
+          <div style="margin-bottom:12px;">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#8A9A5B;margin-bottom:6px;">Do's</p>
+            <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px;">
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="check" style="width:14px;height:14px;color:#8A9A5B;flex-shrink:0;margin-top:3px;"></i>
+                Keep chemicals sealed in original containers with warning labels
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="check" style="width:14px;height:14px;color:#8A9A5B;flex-shrink:0;margin-top:3px;"></i>
+                Hand used motor oil to mechanic workshops with disposal drums
+              </li>
+            </ul>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#991B1B;margin-bottom:6px;">Don'ts</p>
+            <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px;">
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="x" style="width:14px;height:14px;color:#991B1B;flex-shrink:0;margin-top:3px;"></i>
+                Never pour agrochemicals or used oil into street gutters or drains
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="x" style="width:14px;height:14px;color:#991B1B;flex-shrink:0;margin-top:3px;"></i>
+                Never reuse pesticide/chemical containers for drinking water or food
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="background:#1B3A2D;border-radius:8px;padding:12px 16px;color:#D1FAE5;font-size:12px;line-height:1.4;">
+          1 litre of motor oil can contaminate 1 million litres of municipal fresh water aquifers.
+        </div>
+      </div>
+
+      <!-- General -->
+      <div class="ww-card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div class="category-icon">
+              <i data-lucide="trash-2" style="width:22px;height:22px;"></i>
+            </div>
+            <span class="badge badge-moderate">Moderate</span>
+          </div>
+          <h4 style="font-size:24px;font-weight:600;margin-bottom:10px;">General / Residual</h4>
+          
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+            <span class="badge badge-category" style="font-size:11px;">Diapers</span>
+            <span class="badge badge-category" style="font-size:11px;">Styrofoam takeaway</span>
+            <span class="badge badge-category" style="font-size:11px;">Mixed waste</span>
+          </div>
+          <p style="font-size:14px;color:#4A5E4E;line-height:1.5;margin-bottom:16px;">
+            Residual mixed items destined for municipal containment and managed landfills.
+          </p>
+
+          <hr class="ww-divider" style="margin-bottom:16px;">
+
+          <div style="margin-bottom:12px;">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#8A9A5B;margin-bottom:6px;">Do's</p>
+            <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px;">
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="check" style="width:14px;height:14px;color:#8A9A5B;flex-shrink:0;margin-top:3px;"></i>
+                Sort out clean plastics, metals, and organics before bagging residue
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="check" style="width:14px;height:14px;color:#8A9A5B;flex-shrink:0;margin-top:3px;"></i>
+                Tie garbage bags securely for LAWMA or local municipal collection
+              </li>
+            </ul>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#991B1B;margin-bottom:6px;">Don'ts</p>
+            <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:4px;">
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="x" style="width:14px;height:14px;color:#991B1B;flex-shrink:0;margin-top:3px;"></i>
+                Do not dump rubbish in illegal roadside piles or drainage canals
+              </li>
+              <li style="display:flex;align-items:flex-start;gap:6px;">
+                <i data-lucide="x" style="width:14px;height:14px;color:#991B1B;flex-shrink:0;margin-top:3px;"></i>
+                Do not bury mixed plastic-diaper waste in garden soil
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="background:#1B3A2D;border-radius:8px;padding:12px 16px;color:#D1FAE5;font-size:12px;line-height:1.4;">
+          Over 60% of dumpsite waste could be diverted through source separation.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+{% endblock %}

@@ -1,0 +1,326 @@
+{% extends 'base.html' %}
+{% block title %}System Overview | WasteWise NG Admin{% endblock %}
+{% block navigation %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div style="display:flex;min-height:100vh;">
+  <!-- Admin Sidebar -->
+  <aside class="admin-sidebar">
+    <div>
+      <a href="{% url 'home' %}" class="admin-sidebar-logo" style="text-decoration:none;display:block;">
+        WasteWise<span>NG</span>
+      </a>
+
+      <nav style="display:flex;flex-direction:column;gap:4px;">
+        <a href="#overview" class="admin-nav-item active">
+          <i data-lucide="home" style="width:18px;height:18px;"></i>
+          Dashboard
+        </a>
+        <a href="#all-scans" class="admin-nav-item">
+          <i data-lucide="list" style="width:18px;height:18px;"></i>
+          All Scans
+        </a>
+        <a href="#user-management" class="admin-nav-item">
+          <i data-lucide="users" style="width:18px;height:18px;"></i>
+          Users
+        </a>
+        <a href="{% url 'home' %}" class="admin-nav-item">
+          <i data-lucide="globe" style="width:18px;height:18px;"></i>
+          Public Site
+        </a>
+      </nav>
+    </div>
+
+    <!-- Sign out button at bottom of sidebar -->
+    <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:20px;">
+      <div style="margin-bottom:12px;padding:0 12px;">
+        <p style="color:#FFFFFF;font-weight:600;font-size:14px;margin:0;">{{ user.username }}</p>
+        <p style="color:rgba(255,255,255,0.5);font-size:12px;margin:0;">Administrator</p>
+      </div>
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="admin-nav-item" style="width:100%;background:none;border:none;cursor:pointer;text-align:left;">
+          <i data-lucide="log-out" style="width:18px;height:18px;"></i>
+          Sign out
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- Admin Main Content -->
+  <main class="admin-content" style="flex:1;">
+    <div style="max-width:1200px;">
+      <!-- Page Header -->
+      <div id="overview" style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:36px;flex-wrap:wrap;gap:16px;">
+        <div>
+          <h2 style="font-size:40px;font-weight:700;color:#111827;letter-spacing:-0.02em;">System Overview</h2>
+          <p style="font-size:15px;color:#4A5E4E;margin-top:4px;">Platform analytics and system activity log</p>
+        </div>
+        <span class="badge badge-category" style="font-size:13px;padding:6px 14px;">
+          {% now "F j, Y" %}
+        </span>
+      </div>
+
+      <!-- 4 Stat Cards -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:24px;margin-bottom:32px;">
+        <!-- Total Scans -->
+        <div class="ww-card">
+          <p class="result-section-label">Total Scans (All Users)</p>
+          <p class="stat-number">{{ total_scans }}</p>
+          <p class="stat-label">Platform total</p>
+        </div>
+
+        <!-- Total Users -->
+        <div class="ww-card">
+          <p class="result-section-label">Total Users</p>
+          <p class="stat-number">{{ total_users }}</p>
+          <p class="stat-label">Registered accounts</p>
+        </div>
+
+        <!-- Most Classified Waste -->
+        <div class="ww-card">
+          <p class="result-section-label">Most Classified</p>
+          <p class="stat-number" style="font-size:32px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ most_classified }}</p>
+          <p class="stat-label">Dominant material</p>
+        </div>
+
+        <!-- Hazardous Items Flagged -->
+        <div class="ww-card">
+          <p class="result-section-label">Hazardous Items</p>
+          <p class="stat-number">{{ hazardous_scans }}</p>
+          <p class="stat-label">High caution flags</p>
+        </div>
+      </div>
+
+      <!-- Two Charts Side by Side -->
+      <div style="display:grid;grid-template-columns:1fr;gap:24px;margin-bottom:40px;" class="admin-charts">
+        <style>
+          @media (min-width: 900px) {
+            .admin-charts {
+              grid-template-columns: 1fr 1fr !important;
+            }
+          }
+        </style>
+
+        <!-- Left: Category Distribution Doughnut -->
+        <div class="ww-card">
+          <div style="margin-bottom:20px;">
+            <p class="result-section-label">Category Mix</p>
+            <h3 style="font-size:20px;color:#111827;font-weight:600;">Category distribution</h3>
+          </div>
+          <div style="height:260px;position:relative;">
+            {% if total_scans %}
+            <canvas id="admin-category-chart"></canvas>
+            {% else %}
+            <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#6B7280;font-size:14px;">
+              No classification data recorded yet.
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Right: Daily Scans Trend Line -->
+        <div class="ww-card">
+          <div style="margin-bottom:20px;">
+            <p class="result-section-label">Usage Trend</p>
+            <h3 style="font-size:20px;color:#111827;font-weight:600;">Daily scans (7 days)</h3>
+          </div>
+          <div style="height:260px;position:relative;">
+            {% if total_scans %}
+            <canvas id="admin-activity-chart"></canvas>
+            {% else %}
+            <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#6B7280;font-size:14px;">
+              No daily scan activity recorded yet.
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Full Scan Log Table -->
+      <div id="all-scans" class="ww-card" style="margin-bottom:40px;padding:0;overflow:hidden;">
+        <div style="padding:24px 28px;border-bottom:1px solid #E8E4DD;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <p class="result-section-label" style="margin-bottom:2px;">Scan Logs</p>
+            <h3 style="font-size:22px;color:#111827;font-weight:600;">Full scan log</h3>
+          </div>
+          <span class="badge badge-category">{{ recent_scans|length }} displayed</span>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="ww-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Waste Type</th>
+                <th>Specific Item</th>
+                <th>Confidence</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for scan in recent_scans %}
+              <tr>
+                <td style="font-weight:600;color:#111827;">{{ scan.user.username }}</td>
+                <td>
+                  <span class="badge 
+                    {% if scan.predicted_class == 'Hazardous' %}badge-hazardous
+                    {% elif scan.predicted_class == 'Organic' or scan.predicted_class == 'Paper' or scan.predicted_class == 'Textile' %}badge-safe
+                    {% else %}badge-moderate{% endif %}" style="font-size:11px;padding:3px 10px;">
+                    {{ scan.predicted_class }}
+                  </span>
+                </td>
+                <td>{{ scan.specific_item_name|default:scan.predicted_class }}</td>
+                <td style="font-weight:600;color:#1B3A2D;">{{ scan.confidence_score }}%</td>
+                <td style="color:#6B7280;font-size:13px;">{{ scan.created_at|date:"M d, Y · H:i" }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" style="text-align:center;color:#6B7280;padding:32px;">No scan records found.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- User Management Table -->
+      <div id="user-management" class="ww-card" style="padding:0;overflow:hidden;">
+        <div style="padding:24px 28px;border-bottom:1px solid #E8E4DD;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <p class="result-section-label" style="margin-bottom:2px;">Accounts</p>
+            <h3 style="font-size:22px;color:#111827;font-weight:600;">User management</h3>
+          </div>
+          <span class="badge badge-category">{{ users|length }} registered</span>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="ww-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Total Scans</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for person in users %}
+              <tr>
+                <td style="font-weight:600;color:#111827;">{{ person.get_full_name|default:person.username }}</td>
+                <td style="color:#4A5E4E;">{{ person.email|default:"None" }}</td>
+                <td>
+                  {% if person.role == 'admin' %}
+                  <span class="badge badge-category" style="font-size:11px;padding:3px 10px;">Admin</span>
+                  {% else %}
+                  <span class="badge badge-safe" style="font-size:11px;padding:3px 10px;">User</span>
+                  {% endif %}
+                </td>
+                <td style="font-weight:600;color:#1B3A2D;">{{ person.scan_count|default:0 }}</td>
+                <td style="color:#6B7280;font-size:13px;">{{ person.date_joined|date:"M d, Y" }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" style="text-align:center;color:#6B7280;padding:32px;">No user records found.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if total_scans %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{{ chart_labels|json_script:'admin-chart-labels' }}
+{{ chart_counts|json_script:'admin-chart-counts' }}
+{{ activity_labels|json_script:'admin-activity-labels' }}
+{{ activity_counts|json_script:'admin-activity-counts' }}
+<script>
+  const adminLabels = JSON.parse(document.getElementById('admin-chart-labels').textContent);
+  const adminCounts = JSON.parse(document.getElementById('admin-chart-counts').textContent);
+  const adminDays = JSON.parse(document.getElementById('admin-activity-labels').textContent);
+  const adminActivity = JSON.parse(document.getElementById('admin-activity-counts').textContent);
+  
+  // Clean greens and earth tones palette
+  const earthColors = [
+    '#1B3A2D', '#8A9A5B', '#4A5E4E', '#C8D5BA',
+    '#92400E', '#D97706', '#991B1B', '#3D5A27', '#6B7280'
+  ];
+  const fontConfig = { family: 'Inter', size: 12 };
+
+  // Doughnut Chart
+  const ctxDonut = document.getElementById('admin-category-chart');
+  if (ctxDonut) {
+    new Chart(ctxDonut, {
+      type: 'doughnut',
+      data: {
+        labels: adminLabels,
+        datasets: [{
+          data: adminCounts,
+          backgroundColor: earthColors,
+          borderWidth: 2,
+          borderColor: '#FFFFFF'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '70%',
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: { font: fontConfig, color: '#374151', boxWidth: 14 }
+          }
+        }
+      }
+    });
+  }
+
+  // Line Chart
+  const ctxLine = document.getElementById('admin-activity-chart');
+  if (ctxLine) {
+    new Chart(ctxLine, {
+      type: 'line',
+      data: {
+        labels: adminDays,
+        datasets: [{
+          data: adminActivity,
+          borderColor: '#1B3A2D',
+          backgroundColor: 'rgba(138,154,91,0.12)',
+          fill: true,
+          tension: 0.3,
+          borderWidth: 2,
+          pointBackgroundColor: '#1B3A2D',
+          pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { font: fontConfig, color: '#6B7280' }
+          },
+          y: {
+            beginAtZero: true,
+            grid: { color: '#E8E4DD' },
+            ticks: { font: fontConfig, color: '#6B7280', precision: 0 }
+          }
+        }
+      }
+    });
+  }
+</script>
+{% endif %}
+{% endblock %}

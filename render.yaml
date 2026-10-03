@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: wastewise-ng
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "cd backend && gunicorn backend.wsgi:application"
+    envVars:
+      - key: DEBUG
+        value: False
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.11.0

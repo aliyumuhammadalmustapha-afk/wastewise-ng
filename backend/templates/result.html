@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ scan.predicted_class }} Scan Report | WasteWise NG{% endblock %}
+
+{% block content %}
+<main class="page-content section-sm">
+  <div class="container" style="max-width:880px;">
+    <!-- Page Header -->
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:16px;">
+      <div>
+        <span class="badge badge-category" style="margin-bottom:8px;">
+          Saved Report · {{ scan.created_at|date:"M d, Y · H:i" }}
+        </span>
+        <h2 style="font-size:38px;font-weight:700;color:#111827;letter-spacing:-0.01em;">
+          {% if scan.specific_item_name %}{{ scan.specific_item_name }}{% else %}{{ scan.predicted_class }}{% endif %}
+        </h2>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <a href="{% url 'scan' %}" class="btn-primary">
+          <i data-lucide="scan" style="width:16px;height:16px;"></i>
+          Scan another
+        </a>
+        <a href="{% url 'history' %}" class="btn-secondary">
+          <i data-lucide="history" style="width:16px;height:16px;"></i>
+          History
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Result Card -->
+    <div class="ww-card" id="saved-result-card" data-specific-item="{{ scan.specific_item|default:'' }}">
+      <!-- Header row -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+        <span class="badge badge-category">{{ scan.predicted_class }}</span>
+        <span id="result-danger-badge" class="badge 
+          {% if info.danger == 'High' or info.danger == 'Hazardous' %}badge-hazardous
+          {% elif info.danger == 'Moderate' or info.danger == 'Low to moderate' %}badge-moderate
+          {% else %}badge-safe{% endif %}">
+          {{ info.danger|default:"Safe" }} Risk
+        </span>
+        {% if is_nigerian_item or scan.specific_item %}
+        <span class="badge badge-ng">NG Item</span>
+        {% endif %}
+        <span style="font-size:13px;color:#6B7280;margin-left:auto;">
+          {{ scan.confidence_score }}% confident
+        </span>
+      </div>
+
+      <p id="result-material" style="font-size:15px;color:#374151;line-height:1.6;margin-top:8px;">
+        {{ info.about }}
+      </p>
+
+      <hr class="ww-divider" style="margin:24px 0;">
+
+      <!-- Danger level -->
+      <div id="result-danger-card" class="danger-card 
+        {% if info.danger == 'High' or info.danger == 'Hazardous' %}danger-hazardous
+        {% elif info.danger == 'Moderate' or info.danger == 'Low to moderate' %}danger-moderate
+        {% else %}danger-safe{% endif %}" style="margin-bottom:20px;">
+        <p class="result-section-label">Danger level</p>
+        <p id="result-danger-text" class="result-section-value" style="font-weight:600;font-size:17px;margin-top:4px;">
+          {{ info.danger }} – {{ info.danger_note }}
+        </p>
+      </div>
+
+      <!-- Info grid -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#E8E4DD;border-radius:12px;overflow:hidden;margin-bottom:20px;">
+        <div style="background:#FFFFFF;padding:20px;">
+          <p class="result-section-label">Decomposes in</p>
+          <p id="result-decomp" class="result-section-value" style="font-weight:600;margin-top:4px;font-size:14px;">
+            {{ info.decomposition }}
+          </p>
+        </div>
+        <div style="background:#FFFFFF;padding:20px;">
+          <p class="result-section-label">Made of</p>
+          <p id="result-material-grid" class="result-section-value" style="font-weight:600;margin-top:4px;font-size:14px;">
+            {{ scan.predicted_class }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Environmental impact -->
+      <div class="result-section">
+        <p class="result-section-label">
+          <i data-lucide="globe" style="width:12px;height:12px;display:inline;margin-right:4px;"></i>
+          Environmental impact
+        </p>
+        <p id="result-impact" class="result-section-value" style="margin-top:8px;">
+          {{ info.impact }}
+        </p>
+      </div>
+
+      <!-- Disposal steps -->
+      <div class="result-section">
+        <p class="result-section-label">
+          <i data-lucide="list-ordered" style="width:12px;height:12px;display:inline;margin-right:4px;"></i>
+          How to dispose
+        </p>
+        <div id="result-disposal" class="result-section-value" style="margin-top:8px;">
+          {{ info.disposal }}
+        </div>
+      </div>
+
+      <!-- Recycling tips -->
+      <div class="result-section">
+        <p class="result-section-label">
+          <i data-lucide="recycle" style="width:12px;height:12px;display:inline;margin-right:4px;"></i>
+          Recycling tips
+        </p>
+        <p id="result-recycling" class="result-section-value" style="margin-top:8px;">
+          {{ info.recycling }}
+        </p>
+      </div>
+
+      <!-- Reuse ideas -->
+      <div class="result-section">
+        <p class="result-section-label">
+          <i data-lucide="refresh-cw" style="width:12px;height:12px;display:inline;margin-right:4px;"></i>
+          Reuse ideas
+        </p>
+        <p id="result-reuse" class="result-section-value" style="margin-top:8px;">
+          {{ info.reuse }}
+        </p>
+      </div>
+
+      <!-- Fertilizer use -->
+      {% if info.agriculture and info.agriculture != 'Not applicable.' and 'not suitable' not in info.agriculture|lower %}
+      <div class="result-section" id="result-fertilizer-section">
+        <p class="result-section-label">
+          <i data-lucide="sprout" style="width:12px;height:12px;display:inline;margin-right:4px;"></i>
+          Agricultural use
+        </p>
+        <p id="result-fertilizer" class="result-section-value" style="margin-top:8px;">
+          {{ info.agriculture }}
+        </p>
+      </div>
+      {% endif %}
+
+      <!-- Fun fact -->
+      <div class="fun-fact-strip" style="margin-top:20px;">
+        <p class="fun-fact-label">
+          <i data-lucide="lightbulb" style="width:12px;height:12px;display:inline;margin-right:4px;color:#8A9A5B;"></i>
+          Nigerian fact
+        </p>
+        <p id="result-funfact">{{ info.fact }}</p>
+      </div>
+
+      <!-- Bottom button -->
+      <div style="display:flex;gap:12px;margin-top:28px;">
+        <a href="{% url 'scan' %}" class="btn-primary" style="flex:1;justify-content:center;">
+          <i data-lucide="scan" style="width:16px;height:16px;"></i>
+          Scan another waste item
+        </a>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/category_items.js' %}"></script>
+<script>
+  const savedResult = document.getElementById('saved-result-card');
+  const specificInfo = window.specificItemInfo?.[savedResult?.dataset.specificItem];
+  if (specificInfo) {
+    const setText = (id, val) => {
+      const el = document.getElementById(id);
+      if (el && val) el.textContent = val;
+    };
+    setText('result-material', specificInfo.material);
+    setText('result-decomp', specificInfo.decomposition_time);
+    setText('result-impact', specificInfo.environmental_impact);
+    setText('result-recycling', specificInfo.recycling_tips);
+    setText('result-reuse', specificInfo.reuse_ideas);
+    setText('result-funfact', specificInfo.fun_fact);
+
+    if (Array.isArray(specificInfo.disposal_steps)) {
+      const dispEl = document.getElementById('result-disposal');
+      if (dispEl) {
+        dispEl.innerHTML = `<ol style="padding-left:20px;display:flex;flex-direction:column;gap:8px;">${specificInfo.disposal_steps.map(s => `<li>${s}</li>`).join('')}</ol>`;
+      }
+    }
+  }
+</script>
+{% endblock %}

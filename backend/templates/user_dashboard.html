@@ -1,0 +1,278 @@
+{% extends 'base.html' %}
+{% block title %}Your Impact | WasteWise NG{% endblock %}
+
+{% block content %}
+<main class="page-content section-sm">
+  <div class="container">
+    <!-- Header -->
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:36px;flex-wrap:wrap;gap:16px;">
+      <div>
+        <h2 style="font-size:42px;font-weight:700;color:#111827;letter-spacing:-0.02em;">Your Impact</h2>
+        <p style="font-size:16px;color:#4A5E4E;margin-top:4px;">Track your waste classification activity</p>
+      </div>
+      <a href="{% url 'scan' %}" class="btn-primary">
+        <i data-lucide="scan" style="width:16px;height:16px;"></i>
+        Scan Waste
+      </a>
+    </div>
+
+    <!-- 4 Stat Cards in a row -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:24px;margin-bottom:32px;">
+      <!-- Total Scans -->
+      <div class="ww-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <p class="result-section-label" style="margin-bottom:0;">Total Scans</p>
+          <div class="category-icon" style="width:36px;height:36px;">
+            <i data-lucide="leaf" style="width:18px;height:18px;"></i>
+          </div>
+        </div>
+        <p class="stat-number">{{ total_scans }}</p>
+        <p class="stat-label">Items classified</p>
+      </div>
+
+      <!-- Most Common -->
+      <div class="ww-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <p class="result-section-label" style="margin-bottom:0;">Most Common</p>
+          <div class="category-icon" style="width:36px;height:36px;">
+            <i data-lucide="tag" style="width:18px;height:18px;"></i>
+          </div>
+        </div>
+        <p class="stat-number" style="font-size:32px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ most_common|default:"None" }}</p>
+        <p class="stat-label">Frequent category</p>
+      </div>
+
+      <!-- Recyclable -->
+      <div class="ww-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <p class="result-section-label" style="margin-bottom:0;">Recyclable</p>
+          <div class="category-icon" style="width:36px;height:36px;">
+            <i data-lucide="recycle" style="width:18px;height:18px;"></i>
+          </div>
+        </div>
+        <p class="stat-number">{{ recyclable_scans }}</p>
+        <p class="stat-label">Diverted from dumps</p>
+      </div>
+
+      <!-- Hazardous -->
+      <div class="ww-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <p class="result-section-label" style="margin-bottom:0;">Hazardous</p>
+          <div class="category-icon" style="width:36px;height:36px;">
+            <i data-lucide="alert-triangle" style="width:18px;height:18px;"></i>
+          </div>
+        </div>
+        <p class="stat-number">{{ hazardous_scans }}</p>
+        <p class="stat-label">Caution items</p>
+      </div>
+    </div>
+
+    <!-- Chart Section: Two ww-cards side by side -->
+    <div style="display:grid;grid-template-columns:1fr;gap:24px;margin-bottom:32px;" class="dashboard-charts">
+      <style>
+        @media (min-width: 900px) {
+          .dashboard-charts {
+            grid-template-columns: 1fr 1fr !important;
+          }
+        }
+      </style>
+
+      <!-- Left: Scans by category -->
+      <div class="ww-card">
+        <div style="margin-bottom:20px;">
+          <p class="result-section-label">Category Breakdown</p>
+          <h3 style="font-size:22px;color:#111827;font-weight:600;">Scans by category</h3>
+        </div>
+        <div style="height:260px;position:relative;">
+          {% if total_scans %}
+          <canvas id="category-chart"></canvas>
+          {% else %}
+          <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#6B7280;font-size:14px;">
+            No scan categories recorded yet.
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Right: Activity this week -->
+      <div class="ww-card">
+        <div style="margin-bottom:20px;">
+          <p class="result-section-label">Weekly Frequency</p>
+          <h3 style="font-size:22px;color:#111827;font-weight:600;">Activity this week</h3>
+        </div>
+        <div style="height:260px;position:relative;">
+          {% if total_scans %}
+          <canvas id="activity-chart"></canvas>
+          {% else %}
+          <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#6B7280;font-size:14px;">
+            No activity recorded this week yet.
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Scans -->
+    <div class="ww-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <p class="result-section-label">Latest Activity</p>
+          <h3 style="font-size:22px;color:#111827;font-weight:600;">Recent scans</h3>
+        </div>
+        <a href="{% url 'history' %}" style="color:#1B3A2D;font-weight:600;font-size:14px;text-decoration:none;">
+          View full history &rarr;
+        </a>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        {% for scan in recent_scans %}
+        <a href="{% url 'result' scan.id %}" class="history-item" style="text-decoration:none;padding:16px 20px;">
+          <div class="history-item-dot 
+            {% if scan.danger_level == 'Safe' %}dot-safe
+            {% elif scan.danger_level == 'Moderate' %}dot-moderate
+            {% else %}dot-hazardous{% endif %}" style="height:36px;">
+          </div>
+          <div class="category-icon" style="width:40px;height:40px;">
+            {% if scan.predicted_class == 'Plastic' %}
+              <i data-lucide="package" style="width:18px;height:18px;"></i>
+            {% elif scan.predicted_class == 'Metal' %}
+              <i data-lucide="cylinder" style="width:18px;height:18px;"></i>
+            {% elif scan.predicted_class == 'Glass' %}
+              <i data-lucide="wine" style="width:18px;height:18px;"></i>
+            {% elif scan.predicted_class == 'Paper' %}
+              <i data-lucide="file-text" style="width:18px;height:18px;"></i>
+            {% elif scan.predicted_class == 'Organic' %}
+              <i data-lucide="leaf" style="width:18px;height:18px;"></i>
+            {% elif scan.predicted_class == 'E-Waste' %}
+              <i data-lucide="cpu" style="width:18px;height:18px;"></i>
+            {% elif scan.predicted_class == 'Textile' %}
+              <i data-lucide="scissors" style="width:18px;height:18px;"></i>
+            {% elif scan.predicted_class == 'Hazardous' %}
+              <i data-lucide="alert-triangle" style="width:18px;height:18px;"></i>
+            {% else %}
+              <i data-lucide="trash-2" style="width:18px;height:18px;"></i>
+            {% endif %}
+          </div>
+          <div style="flex:1;min-width:0;">
+            <p style="font-weight:600;color:#111827;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              {{ scan.specific_item_name|default:scan.predicted_class }}
+            </p>
+            <p style="font-size:12px;color:#6B7280;margin-top:2px;">
+              {{ scan.predicted_class }} · {{ scan.confidence_score }}% confidence
+            </p>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <span class="badge 
+              {% if scan.danger_level == 'Safe' %}badge-safe
+              {% elif scan.danger_level == 'Moderate' %}badge-moderate
+              {% else %}badge-hazardous{% endif %}" style="font-size:11px;padding:3px 10px;">
+              {{ scan.danger_level|default:"Safe" }}
+            </span>
+            <p style="font-size:11px;color:#9CA3AF;margin-top:4px;">
+              {{ scan.created_at|date:"M d, Y" }}
+            </p>
+          </div>
+        </a>
+        {% empty %}
+        <div style="text-align:center;padding:36px;color:#6B7280;font-size:14px;">
+          <p>No scans recorded yet.</p>
+          <a href="{% url 'scan' %}" class="btn-primary btn-sm" style="margin-top:12px;">Scan your first item</a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+{% if total_scans %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{{ category_labels|json_script:'category-labels' }}
+{{ category_counts|json_script:'category-counts' }}
+{{ activity_labels|json_script:'activity-labels' }}
+{{ activity_counts|json_script:'activity-counts' }}
+<script>
+  const catLabels = JSON.parse(document.getElementById('category-labels').textContent);
+  const catCounts = JSON.parse(document.getElementById('category-counts').textContent);
+  const actLabels = JSON.parse(document.getElementById('activity-labels').textContent);
+  const actCounts = JSON.parse(document.getElementById('activity-counts').textContent);
+  const fontConfig = { family: 'Inter', size: 12 };
+
+  // Horizontal Bar Chart
+  const ctxCategory = document.getElementById('category-chart');
+  if (ctxCategory) {
+    new Chart(ctxCategory, {
+      type: 'bar',
+      data: {
+        labels: catLabels,
+        datasets: [{
+          data: catCounts,
+          backgroundColor: '#8A9A5B',
+          borderRadius: 6,
+          barThickness: 16
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            grid: { color: '#E8E4DD' },
+            ticks: { font: fontConfig, color: '#6B7280', precision: 0 }
+          },
+          y: {
+            grid: { display: false },
+            ticks: { font: fontConfig, color: '#374151' }
+          }
+        }
+      }
+    });
+  }
+
+  // Activity line chart
+  const ctxActivity = document.getElementById('activity-chart');
+  if (ctxActivity) {
+    new Chart(ctxActivity, {
+      type: 'line',
+      data: {
+        labels: actLabels,
+        datasets: [{
+          data: actCounts,
+          borderColor: '#1B3A2D',
+          backgroundColor: 'rgba(138,154,91,0.1)',
+          fill: true,
+          tension: 0.3,
+          borderWidth: 2,
+          pointBackgroundColor: '#1B3A2D',
+          pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { font: fontConfig, color: '#6B7280' }
+          },
+          y: {
+            beginAtZero: true,
+            grid: { color: '#E8E4DD' },
+            ticks: { font: fontConfig, color: '#6B7280', precision: 0 }
+          }
+        }
+      }
+    });
+  }
+</script>
+{% endif %}
+{% endblock %}

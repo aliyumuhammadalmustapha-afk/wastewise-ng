@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% block title %}Scan History | WasteWise NG{% endblock %}
+
+{% block content %}
+<main class="page-content section-sm">
+  <div class="container" style="max-width:980px;">
+    <!-- Page Header -->
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:16px;">
+      <div>
+        <h2 style="font-size:36px;font-weight:700;color:#111827;letter-spacing:-0.02em;">Scan History</h2>
+        <p style="font-size:15px;color:#4A5E4E;margin-top:4px;">
+          {{ total_scans }} scan{{ total_scans|pluralize }} recorded{% if filtered_count != total_scans %} · showing {{ filtered_count }} filtered{% endif %}
+        </p>
+      </div>
+      <a href="{% url 'scan' %}" class="btn-primary">
+        <i data-lucide="scan" style="width:16px;height:16px;"></i>
+        New Scan
+      </a>
+    </div>
+
+    {% if scans %}
+    <!-- Filter row -->
+    <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:12px;margin-bottom:28px;-webkit-overflow-scrolling:touch;">
+      <button type="button" data-filter="all" class="btn-primary btn-sm">All</button>
+      <button type="button" data-filter="Plastic" class="btn-secondary btn-sm">Plastic</button>
+      <button type="button" data-filter="Metal" class="btn-secondary btn-sm">Metal</button>
+      <button type="button" data-filter="Glass" class="btn-secondary btn-sm">Glass</button>
+      <button type="button" data-filter="Paper" class="btn-secondary btn-sm">Paper</button>
+      <button type="button" data-filter="Organic" class="btn-secondary btn-sm">Organic</button>
+      <button type="button" data-filter="E-Waste" class="btn-secondary btn-sm">E-Waste</button>
+      <button type="button" data-filter="Textile" class="btn-secondary btn-sm">Textile</button>
+      <button type="button" data-filter="Hazardous" class="btn-secondary btn-sm">Hazardous</button>
+      <button type="button" data-filter="General" class="btn-secondary btn-sm">General</button>
+    </div>
+
+    <!-- Scan List -->
+    <div id="history-list" style="display:flex;flex-direction:column;gap:12px;">
+      {% for scan in scans %}
+      <a href="{% url 'result' scan.id %}" class="history-item" data-category="{{ scan.waste_class }}" style="text-decoration:none;">
+        <div class="history-item-dot 
+          {% if scan.danger_level == 'Safe' %}dot-safe
+          {% elif scan.danger_level == 'Moderate' %}dot-moderate
+          {% else %}dot-hazardous{% endif %}">
+        </div>
+        
+        <div class="category-icon">
+          {% if scan.waste_class == 'Plastic' %}
+            <i data-lucide="package" style="width:20px;height:20px;"></i>
+          {% elif scan.waste_class == 'Metal' %}
+            <i data-lucide="cylinder" style="width:20px;height:20px;"></i>
+          {% elif scan.waste_class == 'Glass' %}
+            <i data-lucide="wine" style="width:20px;height:20px;"></i>
+          {% elif scan.waste_class == 'Paper' %}
+            <i data-lucide="file-text" style="width:20px;height:20px;"></i>
+          {% elif scan.waste_class == 'Organic' %}
+            <i data-lucide="leaf" style="width:20px;height:20px;"></i>
+          {% elif scan.waste_class == 'E-Waste' %}
+            <i data-lucide="cpu" style="width:20px;height:20px;"></i>
+          {% elif scan.waste_class == 'Textile' %}
+            <i data-lucide="scissors" style="width:20px;height:20px;"></i>
+          {% elif scan.waste_class == 'Hazardous' %}
+            <i data-lucide="alert-triangle" style="width:20px;height:20px;"></i>
+          {% else %}
+            <i data-lucide="trash-2" style="width:20px;height:20px;"></i>
+          {% endif %}
+        </div>
+
+        <div style="flex:1;min-width:0;">
+          <p style="font-weight:600;color:#111827;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            {{ scan.specific_item_name|default:scan.waste_class }}
+          </p>
+          <p style="font-size:13px;color:#6B7280;margin-top:2px;">
+            {{ scan.waste_class }} · {{ scan.confidence }}% confidence
+          </p>
+        </div>
+
+        <div style="text-align:right;flex-shrink:0;">
+          <span class="badge 
+            {% if scan.danger_level == 'Safe' %}badge-safe
+            {% elif scan.danger_level == 'Moderate' %}badge-moderate
+            {% else %}badge-hazardous{% endif %}">
+            {{ scan.danger_level|default:"Safe" }}
+          </span>
+          <p style="font-size:12px;color:#9CA3AF;margin-top:6px;">
+            {{ scan.timestamp|date:"M d, Y" }}
+          </p>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:32px;">
+      {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_confidence %}&confidence={{ selected_confidence }}{% endif %}{% if selected_ordering != 'newest' %}&ordering={{ selected_ordering }}{% endif %}"
+         class="btn-secondary btn-sm">
+        <i data-lucide="chevron-left" style="width:16px;height:16px;"></i>
+        Previous
+      </a>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+        <span class="btn-primary btn-sm" style="pointer-events:none;">{{ num }}</span>
+        {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+        <a href="?page={{ num }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_confidence %}&confidence={{ selected_confidence }}{% endif %}{% if selected_ordering != 'newest' %}&ordering={{ selected_ordering }}{% endif %}"
+           class="btn-secondary btn-sm">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_confidence %}&confidence={{ selected_confidence }}{% endif %}{% if selected_ordering != 'newest' %}&ordering={{ selected_ordering }}{% endif %}"
+         class="btn-secondary btn-sm">
+        Next
+        <i data-lucide="chevron-right" style="width:16px;height:16px;"></i>
+      </a>
+      {% endif %}
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty state -->
+    <div class="ww-card" style="text-align:center;padding:64px 32px;">
+      <div class="category-icon" style="margin:0 auto 20px;width:64px;height:64px;border-radius:16px;">
+        <i data-lucide="scan-line" style="width:28px;height:28px;"></i>
+      </div>
+      <h3 style="font-size:24px;margin-bottom:8px;">No scans yet</h3>
+      <p style="color:#6B7280;margin-bottom:24px;font-size:15px;">
+        Scan your first waste item to start building your history
+      </p>
+      <a href="{% url 'scan' %}" class="btn-primary">
+        Start scanning
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.querySelectorAll('[data-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter;
+      document.querySelectorAll('.history-item').forEach(item => {
+        if (filter === 'all' || item.dataset.category === filter) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+      document.querySelectorAll('[data-filter]').forEach(b => {
+        b.className = 'btn-secondary btn-sm';
+      });
+      btn.className = 'btn-primary btn-sm';
+    });
+  });
+</script>
+{% endblock %}
