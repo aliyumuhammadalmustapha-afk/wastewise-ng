@@ -647,7 +647,7 @@
         <li><a href="{% url 'history' %}" {% if request.resolver_match.url_name == 'history' %}class="active"{% endif %}>History</a></li>
         <li><a href="{% url 'education' %}" {% if request.resolver_match.url_name == 'education' %}class="active"{% endif %}>Learn</a></li>
         <li><a href="{% url 'dashboard' %}" {% if request.resolver_match.url_name == 'dashboard' %}class="active"{% endif %}>Dashboard</a></li>
-        {% if user.is_authenticated and user.role == 'admin' %}
+        {% if user.is_authenticated and user.is_admin_user %}
         <li><a href="{% url 'admin_dashboard' %}" {% if request.resolver_match.url_name == 'admin_dashboard' %}class="active"{% endif %}>Admin</a></li>
         {% endif %}
       </ul>

@@ -44,7 +44,7 @@ def home_view(request):
 
 def register_view(request):
     if request.user.is_authenticated:
-        return redirect('admin_dashboard' if request.user.role == 'admin' else 'dashboard')
+        return redirect('admin_dashboard' if (request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff) else 'dashboard')
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
@@ -57,13 +57,13 @@ def register_view(request):
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('admin_dashboard' if request.user.role == 'admin' else 'dashboard')
+        return redirect('admin_dashboard' if (request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff) else 'dashboard')
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('admin_dashboard' if user.role == 'admin' else 'dashboard')
+            return redirect('admin_dashboard' if (user.role == 'admin' or user.is_superuser or user.is_staff) else 'dashboard')
     else:
         form = AuthenticationForm()
     for name, field in form.fields.items():
@@ -267,7 +267,7 @@ def about_view(request):
     return redirect('home')
 
 def is_admin(user):
-    return user.is_authenticated and user.role == 'admin'
+    return user.is_authenticated and (user.role == 'admin' or user.is_superuser or user.is_staff)
 
 @user_passes_test(is_admin, login_url='home')
 def admin_dashboard_view(request):

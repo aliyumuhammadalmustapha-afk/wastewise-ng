@@ -31,3 +31,15 @@ if [ -n "$DJANGO_SUPERUSER_USERNAME" ]; then
         --email "${DJANGO_SUPERUSER_EMAIL:-admin@example.com}" \
         2>/dev/null || echo "Superuser already exists, skipping."
 fi
+
+# Ensure all superusers and staff have role='admin'
+python -c "
+import os, django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+django.setup()
+from django.contrib.auth import get_user_model
+User = get_user_model()
+count = User.objects.filter(is_superuser=True).update(role='admin')
+print(f'==> Updated {count} superuser(s) with role=admin')
+"
+

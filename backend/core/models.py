@@ -10,6 +10,15 @@ class CustomUser(AbstractUser):
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='user')
     
+    def save(self, *args, **kwargs):
+        if self.is_superuser or self.is_staff:
+            self.role = 'admin'
+        super().save(*args, **kwargs)
+
+    @property
+    def is_admin_user(self):
+        return self.role == 'admin' or self.is_superuser or self.is_staff
+
     def __str__(self):
         return f"{self.username} ({self.role})"
 
