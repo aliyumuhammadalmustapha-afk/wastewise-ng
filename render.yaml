@@ -6,7 +6,7 @@ services:
     plan: free
     pythonVersion: "3.12.7"
     buildCommand: "./build.sh"
-    startCommand: "cd backend && gunicorn backend.wsgi:application"
+    startCommand: "cd backend && gunicorn backend.wsgi:application --workers 1 --threads 2 --timeout 120"
     envVars:
       - key: DEBUG
         value: false

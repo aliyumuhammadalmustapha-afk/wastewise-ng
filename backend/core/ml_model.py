@@ -1,13 +1,10 @@
 import os
 import requests
-import tensorflow as tf
-import numpy as np
-from PIL import Image
 from django.conf import settings
-from tensorflow.keras.applications.efficientnet import preprocess_input
 
 MODEL_PATH = settings.AI_MODEL_PATH
 GDRIVE_FILE_ID = '1wFGyiCBS2JilypI3QvX0uYcWf4TxC2uf'
+
 
 def download_model():
     print('Downloading model from Google Drive...')
@@ -19,11 +16,16 @@ def download_model():
     except Exception as e:
         raise RuntimeError(f'Failed to download model: {e}')
 
+
 model = None
+
 
 def get_model():
     global model
     if model is None:
+        # Lazy import TensorFlow — only loaded when first scan is requested,
+        # not at Django startup. This prevents OOM on Render free tier.
+        import tensorflow as tf
         if not os.path.exists(MODEL_PATH):
             download_model()
         print(f'Loading model from {MODEL_PATH}')
@@ -31,22 +33,29 @@ def get_model():
         print('Model loaded!')
     return model
 
+
 CLASS_LABELS = {
     0: 'E-Waste', 1: 'General', 2: 'Glass',
     3: 'Hazardous', 4: 'Metal', 5: 'Organic',
     6: 'Paper', 7: 'Plastic', 8: 'Textile'
 }
 
+
 def preprocess_image(image_file):
+    import numpy as np
+    from PIL import Image
+    import tensorflow as tf
     img = Image.open(image_file).convert('RGB')
     img = img.resize((224, 224))
     img_array = np.array(img).astype('float32')
-    img_array = preprocess_input(img_array)
+    img_array = tf.keras.applications.efficientnet.preprocess_input(img_array)
     img_array = np.expand_dims(img_array, axis=0)
     return img_array
 
+
 def classify_waste(image_file):
     try:
+        import numpy as np
         m = get_model()
         img_array = preprocess_image(image_file)
         preds = m.predict(img_array, verbose=0)
