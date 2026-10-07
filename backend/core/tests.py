@@ -111,3 +111,56 @@ class WorkspaceTemplateTests(TestCase):
         admin = user_model.objects.create_user(username='template-admin', password='test-password', role='admin')
         client.force_login(admin)
         self.assertEqual(client.get(reverse('admin_dashboard')).status_code, 200)
+
+
+class AuthenticationAndRecoveryTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username='khalifa',
+            email='khalifa@wastewiseng.org',
+            password='ComplexPassword123!'
+        )
+
+    def test_login_with_username(self):
+        response = self.client.post(reverse('login'), {
+            'username': 'khalifa',
+            'password': 'ComplexPassword123!'
+        })
+        self.assertRedirects(response, reverse('dashboard'))
+
+    def test_login_with_email(self):
+        response = self.client.post(reverse('login'), {
+            'username': 'khalifa@wastewiseng.org',
+            'password': 'ComplexPassword123!'
+        })
+        self.assertRedirects(response, reverse('dashboard'))
+
+    def test_login_case_insensitive(self):
+        response = self.client.post(reverse('login'), {
+            'username': 'Khalifa@WasteWiseNG.Org',
+            'password': 'ComplexPassword123!'
+        })
+        self.assertRedirects(response, reverse('dashboard'))
+
+    def test_password_reset_views_render(self):
+        # 1. Reset Form
+        response = self.client.get(reverse('password_reset'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Reset your password')
+
+        # 2. Reset POST
+        post_response = self.client.post(reverse('password_reset'), {
+            'email': 'khalifa@wastewiseng.org'
+        })
+        self.assertRedirects(post_response, reverse('password_reset_done'))
+
+        # 3. Reset Done
+        done_response = self.client.get(reverse('password_reset_done'))
+        self.assertEqual(done_response.status_code, 200)
+        self.assertContains(done_response, 'Check your email')
+
+        # 4. Reset Complete
+        complete_response = self.client.get(reverse('password_reset_complete'))
+        self.assertEqual(complete_response.status_code, 200)
+        self.assertContains(complete_response, 'Password Reset Complete')
+
