@@ -101,10 +101,16 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
+SQLITE_DB_PATH = os.environ.get('SQLITE_DB_PATH')
+if SQLITE_DB_PATH:
+    DEFAULT_DB_PATH = Path(SQLITE_DB_PATH)
+else:
+    DEFAULT_DB_PATH = BASE_DIR / 'db.sqlite3'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': DEFAULT_DB_PATH,
     }
 }
 
@@ -116,6 +122,7 @@ if DATABASE_URL:
             conn_max_age=600
         )
     }
+
 
 
 # Password validation
