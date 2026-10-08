@@ -6,7 +6,7 @@ services:
     plan: free
     pythonVersion: "3.12.7"
     buildCommand: "./build.sh"
-    startCommand: "cd backend && gunicorn backend.wsgi:application --workers 1 --threads 2 --timeout 180"
+    startCommand: "cd backend && python manage.py migrate && gunicorn backend.wsgi:application --workers 1 --threads 2 --timeout 180"
     envVars:
       - key: DEBUG
         value: "false"
@@ -14,3 +14,5 @@ services:
         generateValue: true
       - key: PYTHON_VERSION
         value: "3.12.7"
+      - key: DATA_DIR
+        value: "/var/data"

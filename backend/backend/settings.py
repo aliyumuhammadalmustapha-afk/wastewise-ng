@@ -101,11 +101,20 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
+DATA_DIR = Path(os.environ.get('DATA_DIR', '/var/data')) if (os.environ.get('DATA_DIR') or os.path.exists('/var/data')) else None
 SQLITE_DB_PATH = os.environ.get('SQLITE_DB_PATH')
 if SQLITE_DB_PATH:
     DEFAULT_DB_PATH = Path(SQLITE_DB_PATH)
+elif DATA_DIR:
+    DEFAULT_DB_PATH = DATA_DIR / 'db.sqlite3'
 else:
     DEFAULT_DB_PATH = BASE_DIR / 'db.sqlite3'
+
+# Ensure directory exists for persistent SQLite database
+try:
+    DEFAULT_DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+except Exception:
+    pass
 
 DATABASES = {
     'default': {
@@ -122,6 +131,7 @@ if DATABASE_URL:
             conn_max_age=600
         )
     }
+
 
 
 
@@ -198,9 +208,20 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # Media files configuration (for user uploaded images)
-import os
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT_ENV = os.environ.get('MEDIA_ROOT')
+if MEDIA_ROOT_ENV:
+    MEDIA_ROOT = Path(MEDIA_ROOT_ENV)
+elif DATA_DIR:
+    MEDIA_ROOT = DATA_DIR / 'media'
+else:
+    MEDIA_ROOT = BASE_DIR / 'media'
+
+try:
+    Path(MEDIA_ROOT).mkdir(parents=True, exist_ok=True)
+except Exception:
+    pass
+
 
 # REST Framework settings for JWT Authentication
 REST_FRAMEWORK = {
